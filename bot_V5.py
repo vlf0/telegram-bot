@@ -1,12 +1,14 @@
 from asyncio import sleep
 import logging
-# import pandas as pd
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher, filters
 from aiogram.utils import executor
 from config import BOT_TOKEN, random_photo, chat_id_list, welcome_picture
-from writing_in_excel import columns_list
+from WIE2 import columns_list, message_text
+from Keyboards import keyboard
 
+column_name = []
+sums = []
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=BOT_TOKEN)
@@ -30,39 +32,33 @@ async def process_start_command(message: types.Message):
 
 @dp.message_handler(commands=['report'])
 async def reporting(message: types.Message):
-    kb = [
-           [
-               types.KeyboardButton(text='Нормальная_еда'),
-               types.KeyboardButton(text='Рынок')
-               # [types.KeyboardButton(text='Маркеты')],
-               # [types.KeyboardButton(text='SEVEN_ELEVEN')],
-               # [types.KeyboardButton(text='Транспорт')],
-               # [types.KeyboardButton(text='Прочее')]
-           ],
-         ]
-    keyboard = types.ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
     await bot.send_message(message.chat.id,
                            'Choose something', reply_markup=keyboard)
 
 
 @dp.message_handler(filters.Text(columns_list))
 async def first_var(message: types.Message):
-    await message.answer('Ok, insert the sum: ', reply_markup=types.ReplyKeyboardRemove())
+    global column_name
+    column_name = message.text
+    await message.answer(text='Ok, insert the sum: ')
 
 
 @dp.message_handler(filters.IsReplyFilter(is_reply=True))
 async def take_sum(message: types.Message):
-    if int(message.text):
+    if message.text.isdigit():
+        global sums
+        sums = message.text
         await bot.send_message(chat_id=message.chat.id,
                                text='Ok, this sum will be writen in the your table',
                                reply_to_message_id=message.message_id)
+        message_text(column_name, sums)
     else:
-        await bot.send_message('Please, insert only nums!')
+        await bot.send_message(chat_id=message.chat.id, text='Please, insert only nums!')
 
 
 async def starting_note():
     for ch_id in chat_id_list:
-        await bot.send_message(ch_id, 'Bot is starting!')
+        await bot.send_message(chat_id=ch_id, text='Bot is starting!')
 
 
 if __name__ == '__main__':
