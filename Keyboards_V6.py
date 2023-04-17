@@ -22,8 +22,8 @@ kb_set1 = [
 report_keyboard = ReplyKeyboardMarkup(keyboard=kb_set1, resize_keyboard=True,
                                       one_time_keyboard=True)
 
-kb_set2 = [[KeyboardButton(text='My current location', request_location=True)], ]
+kb_set2 = [[KeyboardButton(text='My current location', request_location=True), ], ]
 geo_keyboard = ReplyKeyboardMarkup(keyboard=kb_set2, resize_keyboard=True, one_time_keyboard=True)
 
-kb_set3 = [[KeyboardButton(text='Комменты')], ]
+kb_set3 = [[KeyboardButton(text='Комменты'), ], ]
 comment_keyboard = ReplyKeyboardMarkup(keyboard=kb_set3, resize_keyboard=True, one_time_keyboard=True)
