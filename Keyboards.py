@@ -27,3 +27,9 @@ geo_keyboard = ReplyKeyboardMarkup(keyboard=kb_set2, resize_keyboard=True, one_t
 
 kb_set3 = [[KeyboardButton(text='Комменты'), ], ]
 comment_keyboard = ReplyKeyboardMarkup(keyboard=kb_set3, resize_keyboard=True, one_time_keyboard=True)
+
+kb_set4 = [[KeyboardButton(text='Да'), KeyboardButton(text='Нет'), ], ]
+report_keyboard2 = ReplyKeyboardMarkup(keyboard=kb_set4, resize_keyboard=True,
+                                       one_time_keyboard=True)
+
+
