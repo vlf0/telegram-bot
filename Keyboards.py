@@ -1,21 +1,29 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
-from WIE2 import columns_list
+from WIE2 import columns_list3
 
 kb_set1 = [
     [
-        KeyboardButton(text=columns_list[0]),
-        KeyboardButton(text=columns_list[1]),
-        KeyboardButton(text=columns_list[2]),
+        KeyboardButton(text=columns_list3[0]),
+        KeyboardButton(text=columns_list3[1]),
+        KeyboardButton(text=columns_list3[2]),
     ],
     [
-        KeyboardButton(text=columns_list[3]),
-        KeyboardButton(text=columns_list[4]),
-        KeyboardButton(text=columns_list[5]),
+        KeyboardButton(text=columns_list3[3]),
+        KeyboardButton(text=columns_list3[4]),
+        KeyboardButton(text=columns_list3[5]),
     ],
     [
-        KeyboardButton(text=columns_list[6]),
-        KeyboardButton(text=columns_list[7]),
-        KeyboardButton(text=columns_list[8]),
+        KeyboardButton(text=columns_list3[6]),
+        KeyboardButton(text=columns_list3[7]),
+        KeyboardButton(text=columns_list3[8]),
+    ],
+    [
+        KeyboardButton(text=columns_list3[9]),
+        KeyboardButton(text=columns_list3[10]),
+        KeyboardButton(text=columns_list3[11]),
+    ],
+    [
+        KeyboardButton(text=columns_list3[12]),
     ],
      ]
 
@@ -33,3 +41,19 @@ report_keyboard2 = ReplyKeyboardMarkup(keyboard=kb_set4, resize_keyboard=True,
                                        one_time_keyboard=True)
 
 
+kb_set5 = [
+            [
+             KeyboardButton(text='Get day report'),
+             KeyboardButton(text='Get current month report'),
+             KeyboardButton(text='Get full tab'),
+             ],
+
+            [
+             KeyboardButton(text='Write data in report'),
+             ],
+
+            [
+             KeyboardButton(text='Delete today\'s data'),
+             ],
+           ]
+report_keyboard3 = ReplyKeyboardMarkup(keyboard=kb_set5, resize_keyboard=True, one_time_keyboard=True)

@@ -9,10 +9,10 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils import executor
-from SQLite3_DB_for_bot import db_table, select_id_column, report_column
-from config import BOT_TOKEN, cat_photo, chat_id_list, welcome_picture
-from functions_for_bot import checking_date
-from WIE2 import columns_list, message_text
+from SQLite3_DB_for_bot import report_column, get_table_name, write_id, get_photos_id, deleting_data
+from config import BOT_TOKEN, chat_id_list
+from functions_for_bot import get_file_size, to_binary
+from WIE2 import columns_list3, message_text, cnt_month, cnt_day, delete_data
 
 
 storage = MemoryStorage()
@@ -20,52 +20,107 @@ column_name = []
 sums = []
 # Configure logging
 logging.basicConfig(level=logging.INFO)
-bot = Bot(token=BOT_TOKEN, parse_mode=types.ParseMode.MARKDOWN_V2)
+PROXY_URL = "http://proxy.server:3128"
+
+
+bot = Bot(token=BOT_TOKEN, proxy=PROXY_URL, parse_mode=types.ParseMode.MARKDOWN_V2)
 dp = Dispatcher(bot, storage=storage)
 
 
 class Form(StatesGroup):
-    email = State()
-    birthday = State()
+    music_file = State()
+    cn_nm_del = State()
     cn_nm = State()
     sm = State()
 
+
+class Mp3Data:
+
+    def __init__(self, filename, file_id, hashes, bb, size, duration):
+        self.filename = filename
+        self.file_id = file_id
+        self.hashes = hashes
+        self.bb = bb
+        self.size = size
+        self.duration = duration
+        self.table = 'music'
+
+
 @dp.message_handler(commands=['start'])
 async def process_start_command(message: types.Message):
-    await message.answer_photo(photo=open(welcome_picture, 'rb'), caption='*Sounds of joy*')
+    await message.answer_document(document='BQACAgIAAxkBAAIUlWRjlOXiaK4_MT35mU0EYuIXXLKvAAK7MgACmCwZS7IBecCSv8nXLwQ',
+                                  caption='*Sounds of joy*')
     await sleep(1)
-    await message.answer('*WARNING\!*\nFor now Insert sums '
-                         'after command *_report_* only\!')
+    await message.answer('*What can i do?*\nDescribe is below\!')
 
 
 @dp.message_handler(commands=['bored'])
-async def process_start_command(message: types.Message):
-    await bot.send_photo(chat_id=message.chat.id,  # selected the chat where from  it was received
-                         photo=open(random.choice(cat_photo), 'rb'),
-                         caption='Enjoy!\n:)', parse_mode='')
+async def fun_command(message: types.Message):
+    try:
+        await bot.send_document(chat_id=message.chat.id,
+                                document=random.choice(get_photos_id()))
+    except IndexError:
+        await bot.send_message(chat_id=message.chat.id,
+                               text='BD is empty right now!',
+                               parse_mode='')
 
 
-@dp.message_handler(commands='location')
+@dp.message_handler(commands='delete')
 async def send_location(message: types.Message):
-    await bot.send_message(chat_id=message.chat.id, text='Send your geo.', reply_markup=Keyboards.geo_keyboard,
-                           parse_mode='')
+    await bot.send_message(chat_id=message.chat.id, text=deleting_data(), parse_mode='')
 
 
 @dp.message_handler(commands=['report'])
-async def reporting(message: types.Message):
+async def choice(message: types.Message):
     if message.chat.id in chat_id_list:
-        await Form.cn_nm.set()
-        await bot.send_message(chat_id=message.chat.id, text='*Choose something:*',
-                               reply_markup=Keyboards.report_keyboard)
+        await bot.send_message(chat_id=message.chat.id, text='*Choice action by button tap\:*',
+                               reply_markup=Keyboards.report_keyboard3)
+
     else:
         await bot.send_message(chat_id=message.chat.id, text='Sorry, this command is not allowed for you.',
                                parse_mode='')
 
 
-@dp.message_handler(commands=['todb'])
-async def testing_db(message: types.Message):
-    await Form.email.set()
-    await message.answer(text="Insert your full email:", parse_mode='')
+@dp.message_handler((filters.Text(['Write data in report',
+                                   'Get day report',
+                                   'Get current month report',
+                                   'Get full tab',
+                                   'Delete today\'s data'])))
+async def answer_button(message: types.Message):
+    if message.text == 'Get full tab':
+        await bot.send_message(chat_id=message.chat.id,
+                               text='Sending report for you...Done.',
+                               parse_mode='', reply_markup=Keyboards.ReplyKeyboardRemove())
+        await bot.send_document(chat_id=message.chat.id,
+                                document=open('/home/vlf/vlf_bot/files/spents.xlsx', 'rb'),
+                                parse_mode='')
+    elif message.text == 'Get day report':
+        await bot.send_message(chat_id=message.chat.id,
+                               text='Sending report for you...Done.',
+                               parse_mode='', reply_markup=Keyboards.ReplyKeyboardRemove())
+        await bot.send_message(chat_id=message.chat.id, text=cnt_day(), parse_mode='')
+    elif message.text == 'Get current month report':
+        await bot.send_message(chat_id=message.chat.id,
+                               text='Sending report for you...Done.',
+                               parse_mode='', reply_markup=Keyboards.ReplyKeyboardRemove())
+        await bot.send_message(chat_id=message.chat.id, text=cnt_month(), parse_mode='')
+    elif message.text == 'Write data in report':
+        await Form.cn_nm.set()
+        await bot.send_message(chat_id=message.chat.id, text='*Choose something:*',
+                               reply_markup=Keyboards.report_keyboard)
+    elif message.text == 'Delete today\'s data':
+        await Form.cn_nm_del.set()
+        await bot.send_message(chat_id=message.chat.id, text='*Choose something:*',
+                               reply_markup=Keyboards.report_keyboard)
+    else:
+        await bot.send_message(chat_id=message.chat.id, text='*Choose something:*',
+                               reply_markup=Keyboards.ReplyKeyboardRemove())
+
+
+@dp.message_handler(commands=['add'])
+async def upload_mp3(message: types.Message):
+    await Form.music_file.set()
+    await message.answer(text='Send mp3 to me\.')
 
 
 @dp.message_handler(state='*', commands='cancel')
@@ -78,63 +133,49 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     await message.answer(text='Ok, exiting.', parse_mode='')
 
 
-@dp.message_handler(state=Form.email)
-async def process_email(message: types.Message, state: FSMContext):
-    emails_ls = ['gmail.com', 'mail.ru', 'yandex.ru', 'owa.mos.ru']
-    if '@' in message.text and message.text.split('@')[1] in emails_ls:
+@dp.message_handler(state=Form.music_file, content_types=types.ContentType.DOCUMENT)
+@dp.message_handler(state=Form.music_file, content_types=types.ContentType.AUDIO)
+async def get_mp3(message: types.Message, state: FSMContext):
+    dwn_fl = r'/home/vlf/vlf_bot/files/mp3_downloaded.mp3'
+    if message.content_type == 'audio' or (message.content_type == 'document'
+            and message.document.mime_type == 'audio/mpeg'):
+        await message.audio.download(destination_file=dwn_fl)
+        ready_mp3 = Mp3Data(filename=get_table_name()[2][0],
+                            file_id=message.audio.file_id,
+                            hashes=to_binary(dwn_fl)[1],
+                            bb=to_binary(dwn_fl)[0],
+                            size=get_file_size(dwn_fl),
+                            duration=message.audio.duration)
         async with state.proxy() as data:
-            data['email'] = message.text
-        await Form.next()
-        await message.answer(text="Insert your birth date in *'YYYY\-MM\-DD'* format:")
-    else:
-        await Form.email.set()
-        await bot.send_message(chat_id=message.chat.id,
-                               text="Insert your real full email\!\n"
-                                    "It must ending with *@ _'your\_provider'_*")
-
-
-@dp.message_handler(state=Form.birthday)
-async def process_email(message: types.Message, state: FSMContext):
-    if not checking_date(message.text):
-        await Form.birthday.set()
-        await bot.send_message(chat_id=message.chat.id,
-                               text="Only *'YYYY\-MM\-DD'* input format is available, "
-                                    "for example _1900\-12\-31_\!")
-    else:
-        async with state.proxy() as data:
-            data['birthday'] = message.text
-
-            us_id = message.from_user.id
-            us_name = message.from_user.first_name
-            us_surname = message.from_user.last_name
-            username = message.from_user.username
-            email = data['email']
-            b_day = data['birthday']
-
-        await bot.send_message(chat_id=message.chat.id,
-                               text=md.text(
-                                   email,
-                                   b_day,
-                                   # md.text('Hi\! Nice to meet you\,', md.bold(data['email'])),
-                                   # md.text('YES\,', md.bold(data['birthday'])),
-                                   sep='\n',
-                                    ),
-                               parse_mode=''
-                               )
-
-        if select_id_column('user_id') is None or int(us_id) not in select_id_column('user_id'):
-            db_table(user_id=us_id, user_name=us_name, user_surname=us_surname,
-                     username=username, email=email, b_day=b_day)
+            data['music_file'] = message.audio.file_name
+            mp3_name = data['music_file']
+        if write_id(table=ready_mp3.table,
+                    file_id=ready_mp3.file_id,
+                    filename=ready_mp3.filename,
+                    hashes=ready_mp3.hashes,
+                    bb=ready_mp3.bb,
+                    size=ready_mp3.size,
+                    duration=ready_mp3.duration):
+            await state.finish()
             await bot.send_message(chat_id=message.chat.id,
-                                   text="*Your data writen down into table\.*")
+                                   text=f'Your track {mp3_name} --> '
+                                        f'({ready_mp3.duration} dur.) was added into your tab.',
+                                   parse_mode='')
         else:
+            await state.finish()
             await bot.send_message(chat_id=message.chat.id,
-                                   text="Your data is *already exist* in DB\!")
-        await state.finish()
-        await sleep(2)
+                                   text=f'Your track {mp3_name} --> '
+                                        f'({ready_mp3.duration} dur.) already exist into your tab.',
+                                   parse_mode='')
+    elif message.document.mime_type != 'audio/mpeg':
+        await Form.music_file.set()
         await bot.send_message(chat_id=message.chat.id,
-                               text='Do you want get list of users names?',
-                               reply_markup=Keyboards.report_keyboard2,
+                               text='File ext. not supported. Try again witn ".mp3" ext.',
+                               parse_mode='')
+    else:
+        await Form.music_file.set()
+        await bot.send_message(chat_id=message.chat.id,
+                               text='Something went wrong. Check it.',
                                parse_mode='')
 
 
@@ -149,55 +190,97 @@ async def report_answer(message: types.Message):
                              parse_mode='')
 
 
-@dp.message_handler(commands=['rmKeyboard'])
+@dp.message_handler(commands=['rmkb'])
 async def removing_keyboards(message: types.Message):
     await message.answer(text='*Removing all keyboards\.*',
                          reply_markup=Keyboards.ReplyKeyboardRemove())
 
 
-@dp.message_handler(filters.Text(columns_list), state=Form.cn_nm)
+@dp.message_handler(filters.Text(columns_list3), state=Form.cn_nm_del)
+async def dropping(message: types.Message, state: FSMContext):
+    global column_name
+    column_name = message.text
+    async with state.proxy() as data:
+        data['cn_nm_del'] = column_name
+    await state.finish()
+    delete_data(column_name)
+    await message.answer(text='*Today\'s data was removed from this column\.* ')
+
+
+
+@dp.message_handler(filters.Text(columns_list3), state=Form.cn_nm)
 async def first_var(message: types.Message, state: FSMContext):
     global column_name
     column_name = message.text
-    if column_name == 'Прочее':
-        await message.reply(text="*NOTE\!\nDon\\'t forget write down comment about that sum\!*\n"
-                                 "_To do it Choose \\'Комменты\\' column by button below  and insert text\._\n\n"
-                                 "Insert the sum: ",
-                            reply_markup=Keyboards.comment_keyboard)
-    elif column_name == 'Комменты':
-        await message.answer(text='*Insert text value (comment)*: ')
-    else:
-        async with state.proxy() as data:
-            data['cn_nm'] = column_name
-        await Form.next()
-        await message.answer(text='*Insert the sum:* ')
+    async with state.proxy() as data:
+        data['cn_nm'] = column_name
+    await Form.next()
+    await message.answer(text='*Insert the sum:* ')
 
 
 @dp.message_handler(state=Form.sm)
 async def take_sum(message: types.Message, state: FSMContext):
     global sums
-    if message.text.isdigit():
+    # if message.text.isdigit():
+    if column_name != "Комменты":
         sums = message.text
         async with state.proxy() as data:
             data['sm'] = sums
         message_text(column_name, sums)
         await state.finish()
         await bot.send_message(chat_id=message.chat.id,
-                               text=md.text('_Ok, this sum_', sums, '_was writen into_', column_name),
+                               text=md.text(f'_Ok, this sum_ *{sums}* _was writen'
+                                            f' into_ *{column_name}*'),
                                reply_to_message_id=message.message_id,
                                reply_markup=Keyboards.ReplyKeyboardRemove())
-    elif message.text.isalpha():
+    else:
         sums = message.text
+        async with state.proxy() as data:
+            data['sm'] = sums
         message_text(column_name, sums)
+        await state.finish()
         await bot.send_message(chat_id=message.chat.id,
-                               text='_Ok, this comment was writen into "Комменты" column\._')
+                               text=md.text('_Ok, this comment was writen into_ *Комменты* _column\._'),
+                               reply_to_message_id=message.message_id,
+                               reply_markup=Keyboards.ReplyKeyboardRemove())
 
 
-async def starting_note():
-    owners = 406086387
-    await bot.send_message(chat_id=owners, text='*Bot is starting\!*')
+@dp.message_handler(content_types=types.ContentType.DOCUMENT)
+async def echo(message: types.Message):
+    if message.document.mime_type == 'image/jpeg':
+        file_path = r'/home/vlf/vlf_bot/files/aio_picture.png'
+        await message.document.download(destination_file=file_path)
+        picture_hash = to_binary(file_path)[1]
+        picture = message.document.file_id
+        if write_id(table='photos_file_id',
+                    file_id=picture,
+                    hashes=picture_hash,
+                    bb=None,
+                    duration=0,
+                    filename='',
+                    size=0):
+            await bot.send_message(chat_id=message.chat.id,
+                                   text='Saved to DB\.')
+            # await bot.send_message(chat_id=message.chat.id,
+            #                       text=picture,
+            #                       parse_mode='')
+        else:
+            await bot.send_message(chat_id=message.chat.id,
+                                   text='Already exists\.')
+    else:
+        await bot.send_message(chat_id=message.chat.id,
+                               text='This ext\. is not supported\. Try only pictures format\.')
+
+
+async def shoot_up(_):
+    await bot.send_message(chat_id='406086387',
+                           text='*Bot is starting\!*')
+
+
+async def shoot_down(_):
+    await bot.send_message(chat_id='406086387',
+                           text='*I go to sleep\.*')
 
 
 if __name__ == '__main__':
-    executor.start(dp, starting_note())
-    executor.start_polling(dp)
+    executor.start_polling(dp, on_startup=shoot_up, on_shutdown=shoot_down)
