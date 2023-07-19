@@ -5,7 +5,6 @@ import string
 import requests
 from datetime import datetime
 
-
 def checking_date(dt):
     if len(dt.split('-')[0]) == 4\
             and len(dt.split('-')[1]) == 2\
