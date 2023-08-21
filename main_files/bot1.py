@@ -1,3 +1,5 @@
+import datetime
+
 import aiogram.utils.markdown as md
 import logging
 import Keyboards
@@ -9,6 +11,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils import executor
 from config import BOT_TOKEN, chat_id_list
 from WIE2 import columns_list3, message_text, cnt_month, cnt_day, delete_data
+from SQLite3_DB_for_bot import keywords, users_tracking
 
 
 storage = MemoryStorage()
@@ -139,6 +142,35 @@ async def take_sum(message: types.Message, state: FSMContext):
                                text=md.text('_Ok, this comment was writen into_ *Комменты* _column\._'),
                                reply_to_message_id=message.message_id,
                                reply_markup=Keyboards.ReplyKeyboardRemove())
+
+
+# caught censored words from list and get ban to user
+# by adding user to db and get him 2 more notice
+# than they were getting ban
+@dp.message_handler(filters.Text(keywords))
+async def caution(message: types.Message):
+    attempts = users_tracking(user_id=message.from_user.id,
+                              username=message.from_user.username,
+                              name=message.from_user.first_name,
+                              surname=message.from_user.last_name,
+                              message_id=message.message_id
+                              )
+    if attempts == 1:
+        print('1st part')
+        await message.reply(text='This is censored words, '
+                                 'you got one notice about this\! You have __*2 more*__\.')
+
+    elif attempts == 2:
+        print('2nd part')
+        await message.reply(text='This is censored words, '
+                                 'you got one notice about this\! You have __*1 more*__\.')
+    else:
+        print('3rd part')
+        await message.reply(text='This is censored words, '
+                                 '__*you are banned*__\! You can contact to admin\.')
+        await bot.ban_chat_member(chat_id=message.chat.id, user_id=message.from_user.id,
+                                  until_date=datetime.timedelta(350))
+    await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
 
 async def shoot_up(_):
