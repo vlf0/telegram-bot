@@ -16,10 +16,10 @@ column_name = []
 sums = []
 # Configure logging
 logging.basicConfig(level=logging.INFO)
-PROXY_URL = "http://proxy.server:3128"
+# PROXY_URL = "http://proxy.server:3128"
 
 
-bot = Bot(token=BOT_TOKEN, proxy=PROXY_URL, parse_mode=types.ParseMode.MARKDOWN_V2)
+bot = Bot(token=BOT_TOKEN, parse_mode=types.ParseMode.MARKDOWN_V2)
 dp = Dispatcher(bot, storage=storage)
 
 
@@ -51,7 +51,8 @@ async def answer_button(message: types.Message):
                                text='Sending report for you...Done.',
                                parse_mode='', reply_markup=Keyboards.ReplyKeyboardRemove())
         await bot.send_document(chat_id=message.chat.id,
-                                document=open('/home/vlf/vlf_bot/static_files/spents.xlsx', 'rb'),
+                                document=open(r'D:\Programming\bot_Maxwell\telegram-bot\static_files\spents.xlsx',
+                                              'rb'),
                                 parse_mode='')
     elif message.text == 'Get day report':
         await bot.send_message(chat_id=message.chat.id,
