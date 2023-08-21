@@ -57,3 +57,7 @@ kb_set5 = [
              ],
            ]
 report_keyboard3 = ReplyKeyboardMarkup(keyboard=kb_set5, resize_keyboard=True, one_time_keyboard=True)
+
+simple_set = [[KeyboardButton(text='Add'), KeyboardButton(text='Do not add'), ], ]
+choice_kb = ReplyKeyboardMarkup(keyboard=simple_set, resize_keyboard=True,
+                                one_time_keyboard=True)

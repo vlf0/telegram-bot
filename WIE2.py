@@ -57,8 +57,7 @@ def cnt_month():
     dates_list = [datetime.datetime.date(data_frame.at[i, 'Дата']) for i in range(len(data_frame['Дата']))]
     current_ind = dates_list.index(local_datetime()['date'])
     strings_sum = data_frame[cl3].sum().to_list()
-    for i in strings_sum:
-        i_ind = strings_sum.index(i)
+    for i_ind, i in enumerate(strings_sum):
         string_markup = {
             0: (' ' * 5),       1: (' ' * 25),      2: (' ' * 20),      3: (' ' * 10),
             4: (' ' * 17),      5: (' ' * 26),      6: (' ' * 22),      7: (' ' * 26),

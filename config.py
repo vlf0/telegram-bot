@@ -1,7 +1,7 @@
 # import os
 
 chat_id_list = [406086387, 150662161]
-with open('/home/vlf/vlf_bot/files/Bot_token.txt', 'r') as bt:
+with open(r'D:\Programming\bot_Maxwell\telegram-bot\files\Bot_token.txt', 'r') as bt:
     BOT_TOKEN = bt.read()
 # welcome_picture = '/home/vlf/vlf_bot/files/welcome.jpg'
 # files_dir_cat = '/home/vlf/vlf_bot/random'
