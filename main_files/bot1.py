@@ -51,7 +51,7 @@ async def answer_button(message: types.Message):
                                text='Sending report for you...Done.',
                                parse_mode='', reply_markup=Keyboards.ReplyKeyboardRemove())
         await bot.send_document(chat_id=message.chat.id,
-                                document=open('/home/vlf/vlf_bot/files/spents.xlsx', 'rb'),
+                                document=open('/home/vlf/vlf_bot/static_files/spents.xlsx', 'rb'),
                                 parse_mode='')
     elif message.text == 'Get day report':
         await bot.send_message(chat_id=message.chat.id,

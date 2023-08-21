@@ -45,8 +45,8 @@ def get_file():  # download excel from my pythonanywhere acc and save to local
     host = "www.pythonanywhere.com"
     token = 'be130000bf73cdfecd90171b274ea0053d6d6033'
     us_name = 'vlf'
-    dd_path = '/home/vlf/vlf_bot/files/spents.xlsx'
-    r = requests.get('https://{host}/api/v0/user/{username}/files'
+    dd_path = '/home/vlf/vlf_bot/static_files/spents.xlsx'
+    r = requests.get('https://{host}/api/v0/user/{username}/static_files'
                      '/path{path}'.format(host=host, username=us_name, path=dd_path),
                      headers={'Authorization': 'Token {token}'.format(token=token)})
     ud_path = r'D:\Загрузки\spents.xlsx'

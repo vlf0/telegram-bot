@@ -7,7 +7,7 @@ columns_list = ('Нормальная_еда Рынок Маркеты  '
                 'Одежда Связь Велики Алкоголь '
                 'Здоровье Прочее Комменты'
                 ).split()
-tab_file = '/home/vlf/vlf_bot/files/spents.xlsx'
+tab_file = '/home/vlf/vlf_bot/static_files/spents.xlsx'
 columns_list3 = ['Нормальная еда', 'Рынок', 'Маркеты', 'SEVEN ELEVEN',
                  'Транспорт', 'Дудка', 'Одежда', 'Связь', 'Велики',
                  'Алкоголь', 'Здоровье', 'Прочее', 'Комменты'

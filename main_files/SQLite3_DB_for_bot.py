@@ -1,6 +1,6 @@
 import sqlite3
 
-contact = sqlite3.connect('/home/vlf/vlf_bot/files/test_db.db3', check_same_thread=False)
+contact = sqlite3.connect('/home/vlf/vlf_bot/static_files/test_db.db3', check_same_thread=False)
 cursor = contact.cursor()
 
 
