@@ -4,6 +4,10 @@ import sqlite3
 keywords = ['бля', 'ебан', 'ебат', 'ёбан', 'пизд', 'пидор', 'пидар']
 
 
+def text():
+    return
+
+
 def select_id_column(column_name):
     contact = sqlite3.connect(r'C:\Users\dr_dn\Desktop\test_db.db3', check_same_thread=False)
     cursor = contact.cursor()
@@ -78,9 +82,6 @@ def users_tracking(user_id, username, name, surname, message_id):
         else:
             contact.close()
             return 'Banned'
-
-
-print(users_tracking(user_id=112848, username='al', name='ox', surname='sl', message_id=123425))
 
 
 def db_table(user_id: int, user_name: str,

@@ -1,5 +1,5 @@
 import datetime
-
+import re
 import aiogram.utils.markdown as md
 import logging
 import Keyboards
@@ -147,30 +147,50 @@ async def take_sum(message: types.Message, state: FSMContext):
 # caught censored words from list and get ban to user
 # by adding user to db and get him 2 more notice
 # than they were getting ban
-@dp.message_handler(filters.Text(keywords))
+# @dp.message_handler(filters.Text(keywords))
+# @dp.message_handler(regexp='бля')
+@dp.message_handler()
 async def caution(message: types.Message):
-    attempts = users_tracking(user_id=message.from_user.id,
-                              username=message.from_user.username,
-                              name=message.from_user.first_name,
-                              surname=message.from_user.last_name,
-                              message_id=message.message_id
-                              )
-    if attempts == 1:
-        print('1st part')
-        await message.reply(text='This is censored words, '
-                                 'you got one notice about this\! You have __*2 more*__\.')
+    # get filter pattern for regexp from list of censored words
+    # and checking if they are in text
+    for censored in keywords:
+        censored_founded = re.search(censored, message.text)
+        if censored_founded:
+            attempts = users_tracking(user_id=message.from_user.id,
+                                      username=message.from_user.username,
+                                      name=message.from_user.first_name,
+                                      surname=message.from_user.last_name,
+                                      message_id=message.message_id
+                                      )
+            if attempts == 1:
+                await message.reply(text='This is censored words, '
+                                         'you got one notice about this\! You have __*2 more*__\.')
 
-    elif attempts == 2:
-        print('2nd part')
-        await message.reply(text='This is censored words, '
-                                 'you got one notice about this\! You have __*1 more*__\.')
-    else:
-        print('3rd part')
-        await message.reply(text='This is censored words, '
-                                 '__*you are banned*__\! You can contact to admin\.')
-        await bot.ban_chat_member(chat_id=message.chat.id, user_id=message.from_user.id,
-                                  until_date=datetime.timedelta(350))
-    await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+            elif attempts == 2:
+                await message.reply(text='This is censored words, '
+                                         'you got one notice about this\! You have __*1 more*__\.')
+            else:
+                await message.reply(text='This is censored words, '
+                                         '__*you are banned*__\! You can contact to admin\.')
+                await bot.ban_chat_member(chat_id=message.chat.id, user_id=message.from_user.id,
+                                          until_date=datetime.timedelta(350))
+            await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+        else:
+            pass
+
+
+# meeting a new members and get restrict to sending messages
+# until user give agree with group rules
+@dp.message_handler(content_types=types.ContentType.NEW_CHAT_MEMBERS)
+async def new_member(message: types.Message):
+    permissions = types.ChatPermissions(can_send_messages=True)
+    # this is user_id a new chat member
+    new_memb = message.new_chat_members[0]["id"]
+    await bot.send_message(chat_id=message.chat.id, text=f'Hello, friend! {new_memb}',
+                           parse_mode='')
+    await bot.restrict_chat_member(chat_id=message.chat.id,
+                                   user_id=new_memb,
+                                   permissions=permissions)
 
 
 async def shoot_up(_):

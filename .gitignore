@@ -164,3 +164,4 @@ cython_debug/
 Bot_token.txt
 spents.xlsx
 test_db.db3
+test.py
