@@ -54,7 +54,7 @@ async def answer_button(message: types.Message):
                                text='Sending report for you...Done.',
                                parse_mode='', reply_markup=Keyboards.ReplyKeyboardRemove())
         await bot.send_document(chat_id=message.chat.id,
-                                document=open(r'D:\Programming\bot_Maxwell\telegram-bot\static_files\spents.xlsx',
+                                document=open(r'D:\Programming\TG_bots\bot_Maxwell\static_files\spents.xlsx',
                                               'rb'),
                                 parse_mode='')
     elif message.text == 'Get day report':
