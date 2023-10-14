@@ -7,7 +7,7 @@ columns_list = ('Нормальная_еда Рынок Маркеты  '
                 'Одежда Связь Велики Алкоголь '
                 'Здоровье Прочее Комменты'
                 ).split()
-tab_file = '/home/vlf/vlf_bot/static_files/spents.xlsx'
+tab_file = '../static_files/spents.xlsx'
 columns_list3 = ['Нормальная еда', 'Рынок', 'Маркеты', 'SEVEN ELEVEN',
                  'Транспорт', 'Дудка', 'Одежда', 'Связь', 'Велики',
                  'Алкоголь', 'Здоровье', 'Прочее', 'Комменты'
@@ -24,23 +24,22 @@ def local_datetime():
     return data
 
 
-def message_text(selected_column, result):
-    data_frame = pd.read_excel(tab_file, sheet_name=None, dtype={'Комменты': 'str'}, engine='openpyxl')
+def message_text(selected_column, result, comment=None):
+    data_frame = pd.read_excel(tab_file, sheet_name=None, dtype={'Комменты': 'object'}, engine='openpyxl')
     sheets = list(data_frame.keys())
     df = data_frame[local_datetime()['month']].select_dtypes(include='datetime64')  # select a column containing dates
     dates_list = [datetime.datetime.date(data_frame[local_datetime()['month']].at[i, 'Дата']) for i in range(len(df))]
     current_ind = dates_list.index(local_datetime()['date'])
     if local_datetime()['date'] in dates_list:
-        if selected_column == 'Комменты':
-            if type(data_frame[local_datetime()['month']].at[current_ind, selected_column]) is float:
-                data_frame[local_datetime()['month']].at[current_ind, selected_column] = str(result)
-            elif type(data_frame[local_datetime()['month']].at[current_ind, selected_column]) is str:
-                data_frame[local_datetime()['month']].at[current_ind, selected_column] += '; ' + str(result)
-        else:
-            if math.isnan(data_frame[local_datetime()['month']].at[current_ind, selected_column]):
-                data_frame[local_datetime()['month']].at[current_ind, selected_column] = int(result)
-            elif math.isfinite(data_frame[local_datetime()['month']].at[current_ind, selected_column]):
-                data_frame[local_datetime()['month']].at[current_ind, selected_column] += int(result)
+        if math.isnan(data_frame[local_datetime()['month']].at[current_ind, selected_column]):
+            data_frame[local_datetime()['month']].at[current_ind, selected_column] = int(result)
+        elif math.isfinite(data_frame[local_datetime()['month']].at[current_ind, selected_column]):
+            data_frame[local_datetime()['month']].at[current_ind, selected_column] += int(result)
+        if comment:
+            if type(data_frame[local_datetime()['month']].at[current_ind, 'Комменты']) is float:
+                data_frame[local_datetime()['month']].at[current_ind, 'Комменты'] = str(comment)
+            elif type(data_frame[local_datetime()['month']].at[current_ind, 'Комменты']) is str:
+                data_frame[local_datetime()['month']].at[current_ind, 'Комменты'] += '; ' + comment
     with pd.ExcelWriter(tab_file, mode='w', engine='xlsxwriter', datetime_format='d mmm',
                         date_format='d mmm') as wb:
         for m in sheets:

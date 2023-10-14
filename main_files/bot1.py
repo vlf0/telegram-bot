@@ -14,12 +14,13 @@ from WIE2 import columns_list3, message_text, cnt_month, cnt_day, delete_data
 storage = MemoryStorage()
 column_name = []
 sums = []
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
-PROXY_URL = "http://proxy.server:3128"
+# PROXY_URL = "http://proxy.server:3128"
 
 
-bot = Bot(token=BOT_TOKEN, proxy=PROXY_URL, parse_mode=types.ParseMode.MARKDOWN_V2)
+bot = Bot(token=BOT_TOKEN, parse_mode=types.ParseMode.MARKDOWN_V2)
 dp = Dispatcher(bot, storage=storage)
 
 
@@ -28,6 +29,7 @@ class Form(StatesGroup):
     cn_nm_del = State()
     cn_nm = State()
     sm = State()
+    comment = State()
 
 
 @dp.message_handler(commands=['report'])
@@ -51,7 +53,7 @@ async def answer_button(message: types.Message):
                                text='Sending report for you...Done.',
                                parse_mode='', reply_markup=Keyboards.ReplyKeyboardRemove())
         await bot.send_document(chat_id=message.chat.id,
-                                document=open('/home/vlf/vlf_bot/static_files/spents.xlsx', 'rb'),
+                                document=open('../static_files/spents.xlsx', 'rb'),
                                 parse_mode='')
     elif message.text == 'Get day report':
         await bot.send_message(chat_id=message.chat.id,
@@ -117,8 +119,16 @@ async def first_var(message: types.Message, state: FSMContext):
 @dp.message_handler(state=Form.sm)
 async def take_sum(message: types.Message, state: FSMContext):
     global sums
-    if column_name != "Комменты":
-        sums = message.text
+    sums = message.text
+    async with state.proxy() as data:
+        data['sm'] = sums
+    if column_name == 'Прочее':
+        await Form.comment.set()
+        await bot.send_message(chat_id=message.chat.id,
+                               text=md.text('Now you need define the comment for this sum\.'),
+                               reply_to_message_id=message.message_id,
+                               reply_markup=Keyboards.ReplyKeyboardRemove())
+    else:
         async with state.proxy() as data:
             data['sm'] = sums
         message_text(column_name, sums)
@@ -128,16 +138,19 @@ async def take_sum(message: types.Message, state: FSMContext):
                                             f' into_ *{column_name}*'),
                                reply_to_message_id=message.message_id,
                                reply_markup=Keyboards.ReplyKeyboardRemove())
-    else:
-        sums = message.text
-        async with state.proxy() as data:
-            data['sm'] = sums
-        message_text(column_name, sums)
-        await state.finish()
-        await bot.send_message(chat_id=message.chat.id,
-                               text=md.text('_Ok, this comment was writen into_ *Комменты* _column\._'),
-                               reply_to_message_id=message.message_id,
-                               reply_markup=Keyboards.ReplyKeyboardRemove())
+
+
+@dp.message_handler(state=Form.comment)
+async def take_sum(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['comment'] = message.text
+    message_text(column_name, sums, data['comment'])
+    await state.finish()
+    await bot.send_message(chat_id=message.chat.id,
+                           text=md.text('Comment writen too.'),
+                           reply_to_message_id=message.message_id,
+                           reply_markup=Keyboards.ReplyKeyboardRemove(),
+                           parse_mode='')
 
 
 async def shoot_up(_):
