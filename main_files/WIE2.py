@@ -2,15 +2,11 @@ import pandas as pd
 import datetime
 import math
 
-columns_list = ('Нормальная_еда Рынок Маркеты  '
-                'SEVEN_ELEVEN Транспорт Дудка '
-                'Одежда Связь Велики Алкоголь '
-                'Здоровье Прочее Комменты'
-                ).split()
 tab_file = '../static_files/spents.xlsx'
-columns_list3 = ['Нормальная еда', 'Рынок', 'Маркеты', 'SEVEN ELEVEN',
-                 'Транспорт', 'Дудка', 'Одежда', 'Связь', 'Велики',
-                 'Алкоголь', 'Здоровье', 'Прочее', 'Комменты'
+columns_list3 = ['Квартира', 'Нормальная еда', 'Рынок', 'Маркеты',
+                 'SEVEN ELEVEN', 'Транспорт', 'Дудка', 'Одежда',
+                 'Связь', 'Велики', 'Алкоголь', 'Здоровье',
+                 'Прочее', 'Комменты'
                  ]
 cl3 = columns_list3.copy()
 cl3.remove(columns_list3[-1])
@@ -58,9 +54,9 @@ def cnt_month():
     strings_sum = data_frame[cl3].sum().to_list()
     for i_ind, i in enumerate(strings_sum):
         string_markup = {
-            0: (' ' * 5),       1: (' ' * 25),      2: (' ' * 20),      3: (' ' * 10),
-            4: (' ' * 17),      5: (' ' * 26),      6: (' ' * 22),      7: (' ' * 26),
-            8: (' ' * 23),      9: (' ' * 19),      10: (' ' * 18),     11: (' ' * 22)
+            0: (' ' * 19), 1: (' ' * 5), 2: (' ' * 25), 3: (' ' * 20), 4: (' ' * 10),
+            5: (' ' * 17), 6: (' ' * 26), 7: (' ' * 22), 8: (' ' * 26),
+            9: (' ' * 23), 10: (' ' * 19), 11: (' ' * 18), 12: (' ' * 22)
         }
         if not math.isnan(strings_sum[i_ind]):
             double_lists.append([cl3[i_ind], str(int(strings_sum[i_ind]))])

@@ -4,26 +4,29 @@ from WIE2 import columns_list3
 kb_set1 = [
     [
         KeyboardButton(text=columns_list3[0]),
+    ],
+    [
         KeyboardButton(text=columns_list3[1]),
         KeyboardButton(text=columns_list3[2]),
+        KeyboardButton(text=columns_list3[3]),
     ],
     [
-        KeyboardButton(text=columns_list3[3]),
         KeyboardButton(text=columns_list3[4]),
         KeyboardButton(text=columns_list3[5]),
+        KeyboardButton(text=columns_list3[6]),
     ],
     [
-        KeyboardButton(text=columns_list3[6]),
         KeyboardButton(text=columns_list3[7]),
         KeyboardButton(text=columns_list3[8]),
+        KeyboardButton(text=columns_list3[9]),
     ],
     [
-        KeyboardButton(text=columns_list3[9]),
         KeyboardButton(text=columns_list3[10]),
         KeyboardButton(text=columns_list3[11]),
+        KeyboardButton(text=columns_list3[12]),
     ],
     [
-        KeyboardButton(text=columns_list3[12]),
+        KeyboardButton(text=columns_list3[13]),
     ],
      ]
 
