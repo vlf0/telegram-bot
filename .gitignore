@@ -1,3 +1,6 @@
+# Docker
+docker-compose.yml
+
 # Byte-compiled / optimized / DLL static_files
 __pycache__/
 *.py[cod]
@@ -160,6 +163,4 @@ cython_debug/
 .idea/
 
 # my own ignoring
-Bot_token.txt
-spents.xlsx
-test_db.db3
+

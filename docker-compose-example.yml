@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  maxwell_bot:
+    build: static_files
+    environment:
+      - BOT_TOKEN=your_token
+    volumes:
+      # Mounting xlsx file
+      - ./static_files/.:/usr/src/Maxwell_bot/static_files

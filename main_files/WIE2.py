@@ -54,9 +54,9 @@ def cnt_month():
     strings_sum = data_frame[cl3].sum().to_list()
     for i_ind, i in enumerate(strings_sum):
         string_markup = {
-            0: (' ' * 19), 1: (' ' * 5), 2: (' ' * 25), 3: (' ' * 20), 4: (' ' * 10),
-            5: (' ' * 17), 6: (' ' * 26), 7: (' ' * 22), 8: (' ' * 26),
-            9: (' ' * 23), 10: (' ' * 19), 11: (' ' * 18), 12: (' ' * 22)
+            0: (' ' * 19),  1: (' ' * 5),   2: (' ' * 25),  3: (' ' * 20), 4: (' ' * 10),
+            5: (' ' * 17),  6: (' ' * 26),  7: (' ' * 22),  8: (' ' * 26),
+            9: (' ' * 23),  10: (' ' * 19), 11: (' ' * 18), 12: (' ' * 22)
         }
         if not math.isnan(strings_sum[i_ind]):
             double_lists.append([cl3[i_ind], str(int(strings_sum[i_ind]))])
@@ -90,28 +90,26 @@ def cnt_day():
                                engine='openpyxl')
     dates_list = [datetime.datetime.date(data_frame.at[i, 'Дата']) for i in range(len(data_frame['Дата']))]
     current_ind = dates_list.index(local_datetime()['date'])
-    strings_sum = data_frame[columns_list3].loc[current_ind]
-    strings_sum = strings_sum.to_list()
+    strings_sum = data_frame[columns_list3].loc[current_ind].to_list()
     for i_ind, i in enumerate(strings_sum):
     # for i in strings_sum:
     #     i_ind = strings_sum.index(i)  # THIS IS FUCKING WRONG!
                                         # this will always return the index of the first occurrence of i,
                                         # not the current one.
         string_markup = {
-            0: (' ' * 5),       1: (' ' * 25),      2: (' ' * 20),      3: (' ' * 10),
-            4: (' ' * 17),      5: (' ' * 26),      6: (' ' * 22),      7: (' ' * 26),
-            8: (' ' * 23),      9: (' ' * 19),      10: (' ' * 18),     11: (' ' * 22),
-            12: (' ' * 17)
+            0: (' ' * 19),  1: (' ' * 5),   2: (' ' * 25),  3: (' ' * 20), 4: (' ' * 10),
+            5: (' ' * 17),  6: (' ' * 26),  7: (' ' * 22),  8: (' ' * 26),
+            9: (' ' * 23),  10: (' ' * 19), 11: (' ' * 18), 12: (' ' * 22), 13: (' ' * 17)
         }
-
-        if isinstance(strings_sum[i_ind], str):
+        if i_ind == 13:
+            double_lists.append([columns_list3[i_ind], f'{data_frame.at[current_ind, "Комменты"]}; '])
+        elif isinstance(strings_sum[i_ind], str):
             double_lists.append([columns_list3[i_ind], data_frame.at[current_ind, 'Комменты']])
         else:
             if not math.isnan(strings_sum[i_ind]):
                 double_lists.append([columns_list3[i_ind], str(int(strings_sum[i_ind]))])
             elif math.isnan(strings_sum[i_ind]):
                 double_lists.append([columns_list3[i_ind], '0'])
-        # result = result + double_lists[i_ind][0] + string_markup[i_ind] + double_lists[i_ind][1] + '\n'
         result = f"{result}{double_lists[i_ind][0]}{string_markup[i_ind]}{double_lists[i_ind][1]}\n"
     result_sum = str(int(data_frame[cl3].loc[current_ind].sum()))
     if len(result_sum) == 1:
@@ -123,7 +121,6 @@ def cnt_day():
 
 def delete_data(column):
     """ Helps to delete today's data from selected column via bot's command. """
-
     data_frame = pd.read_excel(tab_file, sheet_name=None)
     sheets = list(data_frame.keys())
     current_sheet = data_frame[local_datetime()['month']]
